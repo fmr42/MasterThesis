@@ -1,0 +1,118 @@
+
+\begin{tikzpicture}[node distance=2.0cm,>=triangle 60,->]
+
+%% define the sifferent styles that are used
+% primitives
+\tikzstyle{prim}=[ellipse,thick,draw,minimum size=6mm,text width=2.5cm,text badly centered]
+% relationships
+\tikzstyle{rel}=[diamond,draw,inner sep=0pt,text width=1.5cm,text badly centered]
+% simple text/annotations
+\tikzstyle{comment}=[align=center]
+% the background for clustering models
+\tikzstyle{back}=[rounded corners,fill=black!20]
+
+% KF
+\node[prim](BE){Baysian Estimation};
+\node[comment](bf_comm)[left =0.7cm of BE]{Estimation\\ Algorithm\\ Models};	
+\node[rel](bf_re)[below of=BE]{contains};
+\path (BE) edge[->] (bf_re);
+\node[prim](KFs)[below right =0.5cm of bf_re]{Kalman Filter Family};
+\node[prim](PF)[below left =0.5cm of bf_re]{Particle Filters};
+\path (bf_re) edge[->] (KFs);
+\path (bf_re) edge[->] (PF);
+\node[rel](kfs_rel)[below of=KFs]{contains};	
+\path (KFs) edge[->] (kfs_rel);
+\node[prim](ekf)[below of=kfs_rel]{Extended Kalman Filter};
+\node[prim](ukf)[left =0.7cm of ekf]{Uncented Kalman Filter};
+\node[prim](kf)[right =0.7cm of ekf]{Kalman Filter};
+\path (kfs_rel) edge[->] (ukf);
+\path (kfs_rel) edge[->] (ekf);
+\path (kfs_rel) edge[->] (kf);
+\node[prim](ekf)[below of=kfs_rel]{Extended Kalman Filter};
+\node[prim](ukf)[left =0.7cm of ekf]{Uncented Kalman Filter};
+\node[prim](kf)[right =0.7cm of ekf]{Kalman Filter};
+%\node[comment,text=blue](kf_input)[above of=kf]{data model\\ system model\\ sensor model} edge[->,blue] (kf);	
+\begin{pgfonlayer}{background}
+  \node [back,fit=(BE)(bf_comm)(KFs)(PF)(ekf)(kf)(ukf)]{};
+\end{pgfonlayer}
+
+\node[rel](ekf_req)[below right =1cm and 1cm of ekf]{requires};
+\path (ekf) edge[->] (ekf_req);
+\node[prim](system_req)[right =.5cm of ekf_req]{system model};
+\node[prim](sensor_req)[below =.1cm of system_req]{sensor model};
+\node[prim](data_req)[above =.1cm of system_req]{data model};
+\path (ekf_req) edge[->] (system_req.west);
+\path (ekf_req) edge[->] (sensor_req.west);
+\path (ekf_req) edge[->] (data_req.west);
+\begin{pgfonlayer}{background}
+  \node [back,fit=(ekf_req)(system_req)(sensor_req)(data_req)]{};
+\end{pgfonlayer}
+
+
+\node[rel](quad_est_rel)[below of= ekf]{conforms to};
+\node[prim,fill=red!30](quad_est)[below of= quad_est_rel]{Quadrocopter Estimator};
+\path (quad_est) edge[->] (quad_est_rel);
+\path (quad_est_rel) edge[->] (ekf);
+\node[rel](kf_req)[below of=quad_est]{requires};
+\path (quad_est) edge[->] (kf_req);
+
+
+
+
+%TODO: add more KF structure like
+% cont. time/discrete time; EKF, UKF; Particle Filter,...
+
+% Data Model
+\node[prim](pos)[right of=kf_req,xshift=2cm]{Position};
+\node[prim](orient)[below of=pos]{Orientation};
+\path let \p1=($(pos)!0.5!(orient)$) in node[rel,xshift=\getnodedistance](pose_contains)at (\p1){contains};
+\node[prim](pose)[right =0.7cm of pose_contains]{Pose};
+\path (pose) edge (pose_contains);
+\path (pose_contains) edge (pos);
+\path (pose_contains) edge (orient);
+\node[rel](pose_rel)[right =.5cm of pose]{is\_a};
+\node[prim](data_model)[right =0.7cm of pose_rel]{Data Model};
+\path (pose) edge (pose_rel);
+\path (pose_rel) edge (data_model);
+\node[comment](data_model_comment)[above =1cm of data_model]{Data Models};
+\begin{pgfonlayer}{background}
+  \node [back,fit=(pos)(orient)(pose)(data_model)(data_model_comment)]{};
+\end{pgfonlayer}
+
+
+% System Model
+%\node[prim](quad_model)[left =0.7cm of kf_req]{Quadrocopter Model};
+%\node[rel](quad_model_rel)[left =.5cm of quad_model]{is\_a};
+\node[prim](LTI)[left =2.0cm of kf_req]{LTI};
+\node[prim](LTV)[below of= LTI]{LTV};
+\path let \p1=($(LTI)!0.5!(LTV)$) in node[rel,xshift=-1.2*\getnodedistance](lin_model_contains)at (\p1){contains};
+\node[prim](lin_mod)[left =0.7cm of lin_model_contains]{Linear System Models};
+\node[prim](nonlin_mod)[below of = lin_mod]{Nonlinear System Models};
+\path let \p1=($(lin_mod)!0.5!(nonlin_mod)$) in node[rel,xshift=-1.2*\getnodedistance](dyn_sys_contains)at (\p1){contains};
+\node[prim](dyn_sys_mod)[left =0.7cm of dyn_sys_contains]{Dynamic System Model};
+\node[comment](dyn_sys_comment)[above of= dyn_sys_mod]{Dynamic System Model};
+\path (dyn_sys_mod) edge (dyn_sys_contains);
+\path (dyn_sys_contains) edge (lin_mod);
+\path (dyn_sys_contains) edge (nonlin_mod);
+\path (lin_mod) edge (lin_model_contains);
+\path (lin_model_contains) edge (LTI);
+\path (lin_model_contains) edge (LTV);
+%\path (quad_model_rel) edge (LTV);
+%\path (quad_model) edge (quad_model_rel);
+\begin{pgfonlayer}{background}
+  \node [back,fit=(LTV)(LTI)(lin_model_contains)(lin_mod)(nonlin_mod)(dyn_sys_contains)(dyn_sys_mod)(dyn_sys_comment)]{};
+\end{pgfonlayer}
+
+
+% Sensor
+\node[prim](sensor_model)[below =1.5cm of kf_req]{Sensor Model};
+
+
+
+% connect the KF reqirements
+\path (kf_req) edge (pos);
+\path (kf_req) edge (LTI);
+\path (kf_req) edge (sensor_model);
+
+
+\end{tikzpicture}

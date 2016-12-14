@@ -1,0 +1,16 @@
+\documentclass[crop]{standalone}
+
+\usepackage[version=0.96]{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,backgrounds,calc,positioning,fit}
+\usepackage[latin1]{inputenc}
+
+\makeatletter
+\def\getnodedistance{\tikz@node@distance}
+\makeatother
+
+\begin{document}
+
+\input{ekf_general.tikz}
+
+\end{document}

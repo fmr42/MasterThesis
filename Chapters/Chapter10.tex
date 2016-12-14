@@ -1,0 +1,24 @@
+\chapter{Deploy}
+\label{ch:deploy} 
+The simulations showed run with no time constraints while a real use of the software should have hard real-time constraints. The problem of meeting time constrains has multiple solution and can be at least decomposed into two problems:
+\begin{itemize}
+	\item choose the software component that has to meet the constraint;
+	\item how to grantee the time constraint.
+\end{itemize}
+
+The first problem can be addressed by simply making the application \emph{stand-alone}, so that the problem becomes trivial. But the s-block previously used does not meet any quality-of-service requirements and should be re-implemented from scratch. The actual solution for this study case has been to deploy the UBX node on Orocos\autocite{bib:orocos}, a well known software framework specifically designed for the deployment of components-oriented hard real-time applications.\\
+The second problem has multiple solutions too; for years a common work-around to give the Linux kernel real-time behavior was to apply the \emph{RT-Preempt Patch} \autocite{bib:rtlinux}. A more innovative approach is to rely on cgroups, a Linux Kernel feature which allow processes to be organized into hierarchical groups whose usage of various types of resources can then be limited and monitored\autocite{bib:cgroupsman}. With cgroups, it is possible to assign a pre-defined slice of CPU-time to a process and therefore guarantee the respect of the real-time constraints.
+
+\section{Hard RT requirements}
+
+\section{Orocos}
+%git clone git://github.com/orocos-toolchain/rtt.git
+%sudo apt install libboost-filesystem-dev
+%sudo apt install gcc-4.9
+%sudo apt install g++-4.9
+%sudo apt install libboost-all-dev 
+%sudo apt install libboost-dev 
+%sudo apt install libxerces-c-dev
+%sudo apt install doxygen
+
+\section{FSM supervisor}

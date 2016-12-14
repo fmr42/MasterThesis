@@ -1,0 +1,12 @@
+\chapter{Model driven engineering}
+\label{ch:mdl}
+Model driven engineering (MDE from now on) is a promising approach to problem solving, especially in complex applications. MDE alleviate the complexity of the problem by using a domain specific language to express domain specific concepts. This aims to maximize compatibility between systems, especially those implemented by different individuals or different teams: such goal is archived by making terminology and design patterns uniform.
+While MDE is quite popular in software engineering (especially in large software projects), it is still considered not necessary in fields like robotics where the
+
+\section{Metamodelling}
+A model is an abstraction of a real system and it exactly describes its behavior; multiple systems can conform to the same model, meaning that they behave the same (e.g. multiple implementations of a control system).
+The same way, a meta-model is a model of models, meaning that it is yet another abstraction; it is used to describe at a more conceptual level rules and constraints of a given class of models. To make an example, in the study case presented in this thesis the extended Kalman filter conforms to the mathematical model of an extended Kalman filter which in turns conforms to the meta-model of a \emph{state estimator} like models of other types of filters, e.g. a particle filter.
+
+\section{Domain specific languages}
+Domain specific languages (DSL) are languages specifically designed to easily express schemes or patterns commons within a certain field, without the need of details of some particular implementation. DSL are commonly used to describe models and meta-models.
+

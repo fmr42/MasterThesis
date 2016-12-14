@@ -1,0 +1,14 @@
+\chapter{Further work}
+\label{ch:further}
+\section{UBX limitations}
+The UBX framework allows to write blocks with well defined separation of concerns, but does not actually \texttt{require} it: a coder could, for example, make a c-block store data in its private memory space, or make a i-block process the data with a computational behavior.\\
+Moreover another limitation of UBX is that it still does not support blocks composition, while it should be possible to define sub-nodes to be used as regular blocks.\\
+A new library named AB5C is in a very early developing stage and should replace UBX and solve those problematics.
+
+\section{Deploy}
+Deploy of the UBX node in a real-time environment as stand-alone application is trivial, but it could be necessary to integrate the node with other software components.\\
+Orocos if yet another software framework for the real-time execution and communication of (mainly) robotics applications and can be used to run UBX nodes alongside other processes, moreover it embeds a Lua environment in the \texttt{ocl} package that can be used to parse the UBX configuration files and scrits; however ocl is linked to the native Lua libraries that does not support the FFI library necessary to call C functions from Lua.\\
+To demonstrate the feasibility of such set-up, Orocos ocl sorce code has been forked and modified in order link against the LuaJIT libraries. The repository can be found at:\\
+\url{https://github.com/fmr42/ocl}
+
+

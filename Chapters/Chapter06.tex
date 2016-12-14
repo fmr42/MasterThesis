@@ -1,0 +1,87 @@
+\chapter{UBX Framework}
+\label{ch:introduction} 
+UBX is a novel framework created to support the development of 5C compliant programs. The coder does not have to write and compile an executable (indeed, the \emph{behaviors} of the implemented algorithm should be kept isolated) but have to write and compile special \emph{function blocks} which in turns implements those behaviors and are then composed \emph{at runtime} by UBX to produce the desired result. Blocks are actually nothing more than functions contained in libraries, the path of those libraries and how the ports of the blocks should be connected is specified in a configuration file. 
+
+\subsection{Environment}
+A UBX program instance is named \emph{node}. A node is a set of blocks properly connected. There are 3 types of blocks:
+
+\begin{itemize}
+	\item i-blocks: those blocks are capable of storing, transmitting and/or receiving data; they implement the communication and configuration behavior of the node (therefore i-blocks should not manipulate data); they only have an input port (to which data can be written) and an output port (from wich data can be read); i-blocks capable of communications out of the scope of the node are named \emph{bridges};
+	\item c-blocks: are responsible for the computational behavior of the node; when triggered, they can read and/or write from/to i-blocks and perform calculus; c-blocks can have an arbitrary number of input/output ports and must have a trigger port;
+	\item s-blocks: implement the coordination behavior of the node, they can \emph{trigger} (i.e. activate) c-blocks or other s-blocks to produce the overall node expected behavior; s-blocks can have an input trigger port and one or more output trigger port;
+\end{itemize}
+Blocks have a life cycle: when instantiated a block is in a  pre-init state; by calling an init function an instance reaches a pre-start state from which it can jump to a started state by calling the start function. Once started, c-blocks can be triggered (which cause the c-blocks execute the step function) while i-blocks call the read or write function on respectively read and write operations.\\
+The UBX framework is responsible for calling the state-transition function of the blocks and always pass as argument a memory pointer to the so called \emph{context} of the instances (which is unique for each instance); among other things, the context contains a \emph{private data} pointer the instance can use to allocate, indeed, private data.
+\graffito{Thanks to the private data, c-blocks are actually capable of storing data even if formally they should not; this feature was introduced for storing configuration but can be exploited for other purposes.}
+Blocks instances are not aware of blocks instances they are connected to, they do only see pointers (contained in the instance's context) passed by the UBX framework.
+
+\subsection{Ports}
+c-blocks and i-blocks are connected by linking their data ports. A data port has a data type which is predefined by the coder as a \texttt{struct}, typically the data type contains both meta-data and payload data: the meta-data contains an \texttt{uri} to the model to which the payload conforms to.
+
+\subsection{c-blocks}
+c-blocks are pure computation: they should not store any information or data apart from their own configuration: once triggered, they should just read data, perform computation and write out the output data. They implements the \emph{computation behavior}.\\
+The life cycle is composed by an \emph{initialization} phase, a \emph{start} phase, one or more \emph{step} phase, a \emph{stop} phase and a \emph{clean-up} phase. Each phase is implemented in a function, the UBX framework is resposable for calling the functions; UBX passes one single arguments to the function: a pointer to a \texttt{ubx\_block\_t} C struct
+\begin{lstlisting}
+int ciao;
+
+\end{lstlisting}
+During the initialization phase a c-block should perform all the preliminary operations it need and it should reach a state where it is ready to start with no error. Typical operations during the initializations phase is:
+\begin{itemize}
+	\item Check for the availability of hardware resources;
+	\item Allocate the memory necessary during normal operations;
+\end{itemize}
+During the start phase a c-block should finish its configuration and be ready for being triggered; a typical operation is set-up all the parameters.
+The step phase is usually triggered by an i-block and make the c-block perform its functionalities
+
+\subsection{i-blocks}
+i-blocks implement the \emph{configuration and computation behavior}: they are used to store and communicate data (in the main memory, in files, on the network, ecc.) but should not perform non-transparent manipulation of data. If an i-block is able to communicate out it's own UBX context, than it is named as \emph{bridge}.
+The most common type of i-blocks, at least in this application, is a pool of allocated system memory used to exchange data between c-blocks, a read request from a c-block make the i-block write out the stored data while a write operation from a c-block make the i-block store the incoming data
+
+\subsection{s-blocks}
+s-blocks take cares of \emph{coordinantion}. Their role is to trigger c-blocks or other i-blocks.
+
+\subsection{Installation}
+The UBX team uses a stand-alone package\autocite{bib:git:ubx} containing the UBX framework and few demo blocks; this package is not meant for installation. \texttt{git} can be used to download the project:
+\begin{lstlisting}[language=bash]
+git clone https://github.com/UbxTeam/microblx
+\end{lstlisting}
+
+However some works has been done in the context of this thesis, some commits have been accepted in the official UBX project, others was not. One important accepted work is a deploy system for the \texttt{ubx\_launcher} tool\autocite{bib:git:pullreq}. With this feature the main node launcher is able to also read a \texttt{.udc} file containing the configuration to start the blocks in the proper order, without having to access the web interface to manually initialize and start the blocks nor having to create custom deploy scripts.
+\graffito{\autoref{ch:simulation} contains examples on how to lauch the nodes.}
+The deploy file can be (optionally) passed via an argument after the \texttt{-d} switch.
+
+In the context os this thesis however the official project has been forked and splitted into multiple git repositories to organize the work and bound the scope of each of them. In the details:
+\begin{itemize}
+	\item ubx-core: contains the core library and tool from the original UBX project, no blocks there. The link to the repository is:\\
+	\texttt{https://bitbucket.org/fmr42/ubx-core}
+	
+	\item ubx-base: contains base blocks from the original UBX project:\\
+	\texttt{https://bitbucket.org/fmr42/ubx-base}
+	
+	\item ubx-control: contains, among other things, all the blocks necessary to run the copter controller and the configuration and deploy configuration file for the controller simulation nodes; the link to the repository is:\\
+	\texttt{https://bitbucket.org/fmr42/ubx-control}
+\end{itemize}
+
+To download the projects move to the preferred workspace and run:
+\begin{lstlisting}[language=bash]
+git clone https://bitbucket.org/fmr42/ubx-core
+git clone https://bitbucket.org/fmr42/ubx-base
+git clone https://bitbucket.org/fmr42/ubx-control
+\end{lstlisting}
+
+Prior to compile the projects, be sure to satisfy the required dependencies:\\
+\texttt{luajit}, \texttt{libluajit-5.1-dev} (>=2.0.0-beta11, for scripting (optional, but recommended)\\
+\texttt{clang++} (only necessary for compiling C++ blocks)\\
+\texttt{gcc} (v4.6 or newer) or \texttt{clang}\\
+only for development: \texttt{cproto} to generate C prototype header file\\
+
+The install the projects by running:
+\begin{lstlisting}[language=bash]
+make
+sudo make install
+\end{lstlisting}
+into each cloned projects folders.
+The \texttt{install} make goal is not implemented in the original project but is very useful because it copy the shared libraries and the scripts to the proper folders and allow a more natural use of the tool-chain.\\
+\autoref{ch:simulation} will explain how to launch the nodes while \autoref{ch:implementation} will explain the implemented blocks in the details.
+
+
