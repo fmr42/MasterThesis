@@ -1,6 +1,20 @@
 \chapter{Introduction}
 \label{ch:introduction} 
-Every day new technologies are available on the market making the realization of advanced robotics applications easier and accessible to large public. This is leading to a spread of a  number of different approaches to typical problems casing many redundant implementations of relatively common problems.\\
-This thesis investigates a flexible and scalable approach to the development of software for robotics, trying to maximize the potentiality of the underlying components while abstracting the complexity of the low-level implementation. The idea of a component-based software framework is not new: among others we recall Orocos, Open-RTM, ROS, OPRoS and SmartSoft.\\
+Every day new technologies are available on the market making the realization of advanced robotics applications easier and accessible to large public. This is leading to a spread of a  number of different approaches to typical problems causing many redundant implementations of relatively common problems and, usually, waste of energy.\\
+This thesis investigates a flexible and scalable approach to the development of software for robotics, trying to maximize the potentiality of the underlying components while abstracting the complexity of the low-level implementation. The software has been implemented on a new component-based software framework, trying to surmount the limits of other (sometimes more mature) frameworks like Open-RTM, ROS, OPRoS and SmartSoft.\\
+\\
+Details on this work will be explained in the details in this thesis; the sources of the software and everything necessary to reproduce the results can be found in the following git repositories.
+\begin{itemize}
+	\item The LaTeX source of this thesis:\\
+	\texttt{https://github.com/fmr42/MasterThesis}\\
+	
+	\item The UBX project forked from the original repo to support system-wide installation:\\
+	\texttt{https://bitbucket.org/fmr42/ubx-core/}\\
+	\texttt{https://bitbucket.org/fmr42/ubx-base/}\\
+	
+	\item The controller here presented and the \texttt{bcsk} library it depends on:\\
+	\texttt{https://github.com/fmr42/bcsk}\\
+	\texttt{https://bitbucket.org/fmr42/ubx-control/}\\
+\end{itemize}
 
-Details on this work will be explained in the details in this thesis but the sources of the software everything necessary to reproduce the results can be found in git repositories.
+This software has been developed and tested on a Fedora 21 GNU/Linux system running on AMD64 processor and on an Ubuntu Trusty 14.04 running on an ARM processor, however everything as been studied to be highly portable and, once satisfied the dependencies, should compile an all POSIX-compliant platform (Linux, OSX, BSD).

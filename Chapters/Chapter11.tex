@@ -1,3 +1,9 @@
 \chapter{Archived result}
 \label{ch:archived} 
-This work demonstrate how components block application can be developed in UBX. Obviously, this framework is 
+This work demonstrates how a component blocks application can be developed in UBX. Obviously, this framework is not as mature as other projects, but introduces some new concepts not present in other environments.\\
+The whole application works as expected and can easily be ported to other platform: UBX blocks can be compiled for many CPU architectures: AMD64 and ARM has been tested but it should be possible to compile for microcontrollers too.\\
+The time constraints can be easily respected in cheap (but modern) credit-card-sized computer platforms, perhaps a more advanced trigger s-block is necessary.\\
+Moreover	 within the context of this thesis some work has been done to deploy a UBX node on the Orocos environment: first, the Ororcos OCL source code has been forked and linked against LuaJIT instead of the native LUA library to allow the usage of the FFI library, the forked repo can be found at:\\
+\url{https://github.com/fmr42/ocl}\\
+Then the trigger block has been modified to run when triggered by Orocos instead than on a time base. Than the two simulations proposed were launched in this new deploy environment and, as expected, they run as before; the only difference was that the timing for the loop come from the more advance real-time Orocos framework. Also, Linux cgroups where tuned to guarantee the Orocos \emph{hard} real-time constrains.\\
+Please note that this last promising result is part of a work still under development, however the Orocos team seamed to appreciate the work done in the fork.

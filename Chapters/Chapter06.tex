@@ -20,25 +20,21 @@ c-blocks and i-blocks are connected by linking their data ports. A data port has
 
 \subsection{c-blocks}
 c-blocks are pure computation: they should not store any information or data apart from their own configuration: once triggered, they should just read data, perform computation and write out the output data. They implements the \emph{computation behavior}.\\
-The life cycle is composed by an \emph{initialization} phase, a \emph{start} phase, one or more \emph{step} phase, a \emph{stop} phase and a \emph{clean-up} phase. Each phase is implemented in a function, the UBX framework is resposable for calling the functions; UBX passes one single arguments to the function: a pointer to a \texttt{ubx\_block\_t} C struct
-\begin{lstlisting}
-int ciao;
-
-\end{lstlisting}
-During the initialization phase a c-block should perform all the preliminary operations it need and it should reach a state where it is ready to start with no error. Typical operations during the initializations phase is:
+The life cycle is composed by an \emph{initialization} phase, a \emph{start} phase, one or more \emph{step} phase, a \emph{stop} phase and a \emph{clean-up} phase. Each phase is implemented in a function, the UBX framework is resposable for calling the functions; UBX passes one single arguments to the function: a pointer to a \texttt{ubx\_block\_t} C struct.\\
+During the initialization phase a c-block should perform all the preliminary operations it needs and it should reach a state where it is ready to start with no error. Typical operations during the initializations phase is:
 \begin{itemize}
 	\item Check for the availability of hardware resources;
 	\item Allocate the memory necessary during normal operations;
 \end{itemize}
 During the start phase a c-block should finish its configuration and be ready for being triggered; a typical operation is set-up all the parameters.
-The step phase is usually triggered by an i-block and make the c-block perform its functionalities
+The step phase is usually triggered by an i-block and make the c-block perform its functionalities.
 
 \subsection{i-blocks}
-i-blocks implement the \emph{configuration and computation behavior}: they are used to store and communicate data (in the main memory, in files, on the network, ecc.) but should not perform non-transparent manipulation of data. If an i-block is able to communicate out it's own UBX context, than it is named as \emph{bridge}.
-The most common type of i-blocks, at least in this application, is a pool of allocated system memory used to exchange data between c-blocks, a read request from a c-block make the i-block write out the stored data while a write operation from a c-block make the i-block store the incoming data
+i-blocks implement the \emph{configuration and computation behavior}: they are used to store and communicate data (in the main memory, in files, on the network, ecc.) but should not perform non-transparent manipulation of data. If an i-block is able to communicate out its own UBX context, than it is named as \emph{bridge}.
+The most common type of i-blocks, at least in this application, is a pool of allocated system memory used to exchange data between c-blocks: a read request from a c-block make the i-block write out the stored data while a write operation from a c-block make the i-block store the incoming data.
 
 \subsection{s-blocks}
-s-blocks take cares of \emph{coordinantion}. Their role is to trigger c-blocks or other i-blocks.
+s-blocks take cares of \emph{coordinantion}. Their role is to trigger c-blocks or other s-blocks. In this application a single s-block is necessary: as it will be showed this single s-block iterate the control loop at a given timing.
 
 \subsection{Installation}
 The UBX team uses a stand-alone package\autocite{bib:git:ubx} containing the UBX framework and few demo blocks; this package is not meant for installation. \texttt{git} can be used to download the project:
@@ -46,13 +42,13 @@ The UBX team uses a stand-alone package\autocite{bib:git:ubx} containing the UBX
 git clone https://github.com/UbxTeam/microblx
 \end{lstlisting}
 
-However some works has been done in the context of this thesis, some commits have been accepted in the official UBX project, others was not. One important accepted work is a deploy system for the \texttt{ubx\_launcher} tool\autocite{bib:git:pullreq}. With this feature the main node launcher is able to also read a \texttt{.udc} file containing the configuration to start the blocks in the proper order, without having to access the web interface to manually initialize and start the blocks nor having to create custom deploy scripts.
+However some works has been done in the context of this thesis, some commits have been accepted in the official UBX project, others were not. One important accepted work is a deploy system for the \texttt{ubx\_launcher} tool\autocite{bib:git:pullreq}. With this feature the main node launcher is able to also read a \texttt{.udc} file containing the configuration to start the blocks in the proper order, without having to access the web interface to manually initialize and start the blocks nor having to create custom deploy scripts.
 \graffito{\autoref{ch:simulation} contains examples on how to lauch the nodes.}
 The deploy file can be (optionally) passed via an argument after the \texttt{-d} switch.
 
 In the context os this thesis however the official project has been forked and splitted into multiple git repositories to organize the work and bound the scope of each of them. In the details:
 \begin{itemize}
-	\item ubx-core: contains the core library and tool from the original UBX project, no blocks there. The link to the repository is:\\
+	\item ubx-core: contains the core library and tools from the original UBX project, no blocks there. The link to the repository is:\\
 	\texttt{https://bitbucket.org/fmr42/ubx-core}
 	
 	\item ubx-base: contains base blocks from the original UBX project:\\
@@ -69,19 +65,24 @@ git clone https://bitbucket.org/fmr42/ubx-base
 git clone https://bitbucket.org/fmr42/ubx-control
 \end{lstlisting}
 
+\texttt{ubx-control} depends on the following library too:
+\begin{lstlisting}[language=bash]
+git clone https://github.com/fmr42/bcsk
+\end{lstlisting}
+
 Prior to compile the projects, be sure to satisfy the required dependencies:\\
 \texttt{luajit}, \texttt{libluajit-5.1-dev} (>=2.0.0-beta11, for scripting (optional, but recommended)\\
 \texttt{clang++} (only necessary for compiling C++ blocks)\\
 \texttt{gcc} (v4.6 or newer) or \texttt{clang}\\
 only for development: \texttt{cproto} to generate C prototype header file\\
 
-The install the projects by running:
+Then, install the projects by running:
 \begin{lstlisting}[language=bash]
 make
 sudo make install
 \end{lstlisting}
 into each cloned projects folders.
-The \texttt{install} make goal is not implemented in the original project but is very useful because it copy the shared libraries and the scripts to the proper folders and allow a more natural use of the tool-chain.\\
+The \texttt{install} make goal is not implemented in the original project but is very useful because it copies the shared libraries and the scripts to the proper folders and allow a more natural use of the tool-chain.\\
 \autoref{ch:simulation} will explain how to launch the nodes while \autoref{ch:implementation} will explain the implemented blocks in the details.
 
 
